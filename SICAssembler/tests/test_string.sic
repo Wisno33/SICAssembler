@@ -1,0 +1,15 @@
+# Copy an 11-byte string from one location to another.
+# Using indexed addressing.
+TEST	START	4000		   #jdjdj
+DST	RESB	11 #sods
+ELEVEN	WORD	11
+LOOP	LDX	ZERO
+	LDCH	SRC,X
+	STCH	DST,X
+	TIX	ELEVEN
+	JLT	LOOP
+	RSUB		#sss
+SRC	BYTE	C'TEST STRING' #sdljsn
+ZERO	WORD	0
+FIN	END	LOOP
+#End program
