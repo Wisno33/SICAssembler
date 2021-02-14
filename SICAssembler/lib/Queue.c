@@ -46,6 +46,18 @@ void queue_enqueue(queue* q, queue_element* item)
     q->size += 1;
 }
 
+//Returns the item on the front of the queue does not remove.
+void* queue_peek(queue* q)
+{
+	//Checks if queue is empty.
+	if(q->size == 0)
+	{
+		return NULL;
+	}
+	
+	return q->queue[q->front]->item;
+}
+
 //Removes an item from the queue and returns it. O(1)
 void* queue_dequeue(queue* q)
 {

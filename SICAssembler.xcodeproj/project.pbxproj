@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DD0068BB25D85793003F0FE2 /* pass2.c in Sources */ = {isa = PBXBuildFile; fileRef = DD0068BA25D85793003F0FE2 /* pass2.c */; };
 		DD7193D125D1F67D0035398C /* Hash_Table.c in Sources */ = {isa = PBXBuildFile; fileRef = DD7193D025D1F67D0035398C /* Hash_Table.c */; };
 		DD7193D525D1F6850035398C /* Queue.c in Sources */ = {isa = PBXBuildFile; fileRef = DD7193D425D1F6850035398C /* Queue.c */; };
 		DD7193D925D1F68E0035398C /* Stack.c in Sources */ = {isa = PBXBuildFile; fileRef = DD7193D825D1F68E0035398C /* Stack.c */; };
@@ -30,6 +31,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		DD0068B925D85793003F0FE2 /* pass2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pass2.h; sourceTree = "<group>"; };
+		DD0068BA25D85793003F0FE2 /* pass2.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = pass2.c; sourceTree = "<group>"; };
 		DD168FB425D2C3DE00050C45 /* copy.sic */ = {isa = PBXFileReference; lastKnownFileType = text; path = copy.sic; sourceTree = "<group>"; };
 		DD168FB525D2C3EC00050C45 /* test_string.sic */ = {isa = PBXFileReference; lastKnownFileType = text; path = test_string.sic; sourceTree = "<group>"; };
 		DD7193CF25D1F67D0035398C /* Hash_Table.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Hash_Table.h; sourceTree = "<group>"; };
@@ -126,6 +129,8 @@
 				DDAE6A6925D1A60600B0BAA2 /* instructions.txt */,
 				DD7193DB25D1FAAD0035398C /* assembler_components.h */,
 				DD7193DC25D1FAAD0035398C /* assembler_components.c */,
+				DD0068B925D85793003F0FE2 /* pass2.h */,
+				DD0068BA25D85793003F0FE2 /* pass2.c */,
 			);
 			path = SIC;
 			sourceTree = "<group>";
@@ -189,6 +194,7 @@
 				DD7193D125D1F67D0035398C /* Hash_Table.c in Sources */,
 				DDAE6A6125D1A5AD00B0BAA2 /* pass1.c in Sources */,
 				DD7193DD25D1FAAD0035398C /* assembler_components.c in Sources */,
+				DD0068BB25D85793003F0FE2 /* pass2.c in Sources */,
 				DD7193D525D1F6850035398C /* Queue.c in Sources */,
 				DDAE6A5125D1A49200B0BAA2 /* main.c in Sources */,
 				DDAA92A325D5EBB9008E1147 /* Functions.c in Sources */,

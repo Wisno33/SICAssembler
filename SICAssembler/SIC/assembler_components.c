@@ -1,12 +1,5 @@
 //  assembler_components.c
 
-//STD C libraries.
-#include <stdio.h>
-#include <string.h>
-
-//Data Structures
-#include "Hash_Table.h"
-
 //Header for function prototypes.
 #include "assembler_components.h"
 

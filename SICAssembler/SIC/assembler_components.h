@@ -3,6 +3,14 @@
 #ifndef assembler_components_h
 #define assembler_components_h
 
+//STD C libraries.
+#include <stdio.h>
+#include <string.h>
+
+//Data Structures
+#include "Hash_Table.h"
+#include "Queue.h"
+
 /*
  * Structures used in during the assembly process.
  */
@@ -41,6 +49,38 @@ typedef struct symbol
     int address;
     char name[7];
 } symbol;
+
+//Structure to contain a header record to be written to a file.
+typedef struct header_record
+{
+	char identifier;
+	int start_address;
+	int program_size;
+	char name[7];
+} header_record;
+
+//Structure to contain a text record to be written to a file.
+typedef struct text_record
+{
+	char identifier;
+	int start_address;
+	int record_len;
+	queue* object_data;
+} text_record;
+
+//Structure to contain an end record to be written to a file.
+typedef struct end_record
+{
+	char identifier;
+	int first_instruction;
+} end_record;
+
+
+//Structure to contain a modification record to be written to a file.
+typedef struct modification_record
+{
+	char identifier;
+} modification_record;
 
 //Public functions.
 

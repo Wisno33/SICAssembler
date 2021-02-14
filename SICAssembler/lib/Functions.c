@@ -80,3 +80,25 @@ int is_integer(char* num_string)
 	
 	return 1;
 }
+
+//Removes the extension of a file.
+void remove_file_extension(char* file_name)
+{
+	if(file_name == NULL)
+	{
+		return;
+	}
+	
+	//Finds the first dot in a string and sets it to the null char essentially terminating the string.
+	int i = (int) strlen(file_name) - 1;
+	for(; i>-1; i--)
+	{
+		if(file_name[i] == 46)
+		{
+			file_name[i] = '\0';
+			return;
+		}
+	}
+	
+	return;
+}

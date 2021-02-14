@@ -14,12 +14,16 @@
 #include <stdio.h>
 #include <string.h>
 
+//Helper functions
+#include "Functions.h"
+
 // Data Structures
 #include "Hash_Table.h"
 
 //SIC Library
 #include "initialize.h"
 #include "pass1.h"
+#include "pass2.h"
 
 int main(int argc, const char * argv[]) {
     
@@ -45,9 +49,12 @@ int main(int argc, const char * argv[]) {
     hash_table* instruct_tab = hash_table_init();
     hash_table* sym_tab = hash_table_init();
     
-    //Stores the address of the first instruction.
-    int first_instruction = 0;
+    //Stores the address of the first instruction, initialized to -1 for error checking.
+    int first_instruction = -1;
+	//Stores the size of the program;
     int program_size = 0;
+	
+	//Loads the directive and instruction table from a pair of files.
     initialize_assembler(dir_tab, instruct_tab);
     
 	//Runs pass 1 of the assembler to build a symbol table and look for some syntax errors. If pass 1 returns a 1 the assembler exits.
@@ -56,11 +63,16 @@ int main(int argc, const char * argv[]) {
         return 1;
 	}
 	
-	//rewind(input);
+	rewind(input);
 	
-	//if(pass2())
-	//	return 1;
-    
+	char* input_file_name = argv[1];
+	remove_file_extension(input_file_name);
+	
+	if(pass2(dir_tab, instruct_tab, sym_tab, input, input_file_name, first_instruction, program_size))
+	{
+		return 1;
+	}
+	
     fclose(input);
     
     return 0;

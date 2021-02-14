@@ -38,7 +38,6 @@ int pass1(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 {
 	int source_line = 1;
 	int location_counter = 0;
-	int start_symbol = 0;
 	int start_dir_encountered = 0;
 	int end_dir_encountered = 0;
 	int start_address = 0;
@@ -55,6 +54,13 @@ int pass1(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 		//Checks if the line is a comment if true the line is discarded. If the line is not a comment it must be processed.
 		if(!is_comment(line))
 		{
+			//If there are any non comments after an END directive error.
+			if(end_dir_encountered)
+			{
+				printf("ERROR! No statements allowed after END directive Line: %d\n", source_line);
+				return 1;
+			}
+			
 			//Get tokens, a line may have up to 3 tokens and a comment, comments are discarded.
 			//Input lines take this general form: O denotes optional.
 			/*
@@ -135,8 +141,6 @@ int pass1(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 				token1 = NULL;
 			}
 			
-			
-			
 			//Removes extra whitespace on the tokens.
 			token2 = remove_begin_whitespace(token2);
 			token3 = remove_begin_whitespace(token3);
@@ -158,29 +162,61 @@ int pass1(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 			//Checks if the line contains a directive, if so pass1 will take appropriate action.
 			if(is_directive(dir_tab, token2))
 			{
+				//End directive.
+				if(!strcmp(token2, "END"))
+				{
+					if(token3 != NULL)
+					{
+					
+						//Removes extra whitespace.
+						remove_end_whitespace(token3);
+						
+						symbol* temp = hash_table_get(sym_tab, token3);
+					
+						//If the symbol for the first instruction does not exist error.
+						if(temp == NULL)
+						{
+							printf("ERROR! Not a valid first instruction for END directive Line: %d\n", source_line);
+							return 1;
+						}
+					
+						//Checks that the first instruction is the same as the one specified by end.
+						if(*first_instruction != temp->address)
+						{
+							printf("ERROR! First actual instruction address %X and END specified address %X do not match Line: %d\n", *first_instruction, temp->address, source_line);
+							return 1;
+						}
+					}
+					
+					end_dir_encountered = 1;
+					source_line += 1;
+					continue;
+				}
+				
+				if(token3 == NULL)
+				{
+					printf("ERROR! No operand for %s directive Line: %d, %s\n", token2, source_line, token3);
+					return 1;
+				}
+				
 				//If the directive is START location counter is set to the operand provided.
 				if(!strcmp(token2, "START"))
 				{
 					//If START is encountered already an error is displayed.
 					if(start_dir_encountered)
 					{
-						printf("ERROR! Multiple START directives 2nd START Line %d, %s\n", source_line, token3);
+						printf("ERROR! Multiple START directives 2nd START Line: %d, %s\n", source_line, token3);
 						return 1;
 					}
 					
 					//Checks if the START directive has a symbol.
-					if(token1 != NULL)
+					if(token1 == NULL)
 					{
-						start_symbol = 1;
+						printf("ERROR! Missing program/library name (symbol for START directive) Line: %d\n", source_line);
+						return 1;
 					}
 					
 					start_dir_encountered = 1;
-					
-					if(token3 == NULL)
-					{
-						printf("ERROR! No operand for START directive Line: %d, %s\n", source_line, token3);
-						return 1;
-					}
 					
 					//Removes extra whitespace.
 					remove_end_whitespace(token3);
@@ -190,25 +226,20 @@ int pass1(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 					start_address = location_counter;
 					
 					//Add the location counter to the first symbol, if it exists.
-					if(start_symbol)
-					{
-						symbol* start_symbol = hash_table_get(sym_tab, strtok(line, " \t"));
-						start_symbol->address = location_counter;
-					}
-					
+					symbol* start_symbol = hash_table_get(sym_tab, strtok(line, " \t"));
+					start_symbol->address = location_counter;
+				}
+				
+				//Start directive must be defined before any other directive is allowed.
+				else if (!start_dir_encountered)
+				{
+					printf("ERROR! START directive not defined Line: %d\n", source_line);
+					return 1;
 				}
 				
 				//If BYTE directive is encountered the location counter is increased by the size of the operand in bytes.
 				else if(!strcmp(token2, "BYTE"))
 				{
-					if(token3 == NULL)
-					{
-						printf("ERROR! No operand for BYTE directive Line: %d, %s\n", source_line, token3);
-						return 1;
-					}
-					
-					
-					
 					//If the operand is a character constant location counter is incremented by len(operand) bytes.
 					if(token3[0] == 'C')
 					{
@@ -248,12 +279,6 @@ int pass1(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 				//If WORD is encountered the location counter is incremented the size of a SIC word 3 bytes.
 				else if(!strcmp(token2, "WORD"))
 				{
-					if(token3 == NULL)
-					{
-						printf("ERROR! No operand for WORD directive Line: %d, %s\n", source_line, token3);
-						return 1;
-					}
-					
 					//Removes extra whitespace.
 					remove_end_whitespace(token3);
 					
@@ -278,12 +303,6 @@ int pass1(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 				//Reserves the specified number of bytes, and increments the location counter by the number of bytes reserved.
 				else if(!strcmp(token2, "RESB"))
 				{
-					if(token3 == NULL)
-					{
-						printf("ERROR! No operand for RESB directive Line: %d, %s\n", source_line, token3);
-						return 1;
-					}
-					
 					//Removes extra whitespace.
 					remove_end_whitespace(token3);
 					
@@ -302,12 +321,6 @@ int pass1(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 				//Reserves the specified number of words, and increments the location counter by number of words * 3.
 				else if(!strcmp(token2, "RESW"))
 				{
-					if(token3 == NULL)
-					{
-						printf("ERROR! No operand for RESW directive Line: %d, %s\n", source_line, token3);
-						return 1;
-					}
-					
 					//Removes extra whitespace.
 					remove_end_whitespace(token3);
 					
@@ -326,12 +339,6 @@ int pass1(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 				//Reserves space for an external reference 3 bytes.
 				else if(!strcmp(token2, "RESR"))
 				{
-					if(token3 == NULL)
-					{
-						printf("ERROR! No operand for RESR directive Line: %d, %s\n", source_line, token3);
-						return 1;
-					}
-					
 					//Removes extra whitespace.
 					remove_end_whitespace(token3);
 					
@@ -341,43 +348,27 @@ int pass1(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 				//Export the symbol address pass 2.
 				else if(!strcmp(token2, "EXPORTS"))
 				{
-					if(token3 == NULL)
-					{
-						printf("ERROR! No operand for EXPORTS directive Line: %d, %s\n", source_line, token3);
-						return 1;
-					}
-					
 					//Removes extra whitespace.
 					remove_end_whitespace(token3);
-				}
-				
-				//End directive.
-				else
-				{
-					if(token3 != NULL)
-					{
-						//Removes extra whitespace.
-						remove_end_whitespace(token3);
-						
-						symbol* temp = hash_table_get(sym_tab, token3);
-						
-						//If the symbol for the first instruction does not exist error.
-						if(temp == NULL)
-						{
-							printf("ERROR! Not a valid first instruction for END directive Line: %d\n", source_line);
-							return 1;
-						}
-						
-						*first_instruction = temp->address;
-					}
-					
-					end_dir_encountered = 1;
 				}
 			}
 			
 			//Checks if the line contains an instruction if so add instruction length to the location counter.
 			else if(is_instruction(instruct_tab, token2))
 			{
+				//Marks address of first instruction if not found yet.
+				if(*first_instruction == -1)
+				{
+					*first_instruction = location_counter;
+				}
+				
+				//Start directive must be defined before any instruction is allowed.
+				if (!start_dir_encountered)
+				{
+					printf("ERROR! START directive not defined Line: %d\n", source_line);
+					return 1;
+				}
+				
 				instruction* temp = (instruction*) hash_table_get(instruct_tab, token2);
 				location_counter += temp->size;
 			}
@@ -385,7 +376,7 @@ int pass1(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 			//Errors due to a non valid line format.
 			else
 			{
-				printf("ERROR! Unrecognized instruction, directive, or line format Line: %d, %s\n", source_line, token2);
+				printf("ERROR! Unrecognized instruction, directive, or line format Line: %d\n", source_line);
 				return 1;
 			}
 		}
@@ -424,7 +415,7 @@ int pass1(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 	}
 	
 	//Prints the symbol table.
-	print_sym_tab(sym_tab, symbol_order);
+	//print_sym_tab(sym_tab, symbol_order);
 	
 	return 0;
 }

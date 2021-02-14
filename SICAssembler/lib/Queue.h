@@ -33,6 +33,9 @@ queue* queue_init(int capacity);
 //Places an item in the queue. O(1)
 void queue_enqueue(queue* q, queue_element* item);
 
+//Returns the item on the front of the queue does not remove.
+void* queue_peek(queue* q);
+
 //Removes an item from the queue and returns it. O(1)
 void* queue_dequeue(queue* q);
 
