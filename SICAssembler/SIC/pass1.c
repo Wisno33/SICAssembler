@@ -193,6 +193,7 @@ int pass1(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 					continue;
 				}
 				
+				//All directives except END must have an operand.
 				if(token3 == NULL)
 				{
 					printf("ERROR! No operand for %s directive Line: %d, %s\n", token2, source_line, token3);

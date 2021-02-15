@@ -68,10 +68,10 @@ int main(int argc, const char * argv[]) {
 	char* input_file_name = argv[1];
 	remove_file_extension(input_file_name);
 	
-	if(pass2(dir_tab, instruct_tab, sym_tab, input, input_file_name, first_instruction, program_size))
+	/*if(pass2(dir_tab, instruct_tab, sym_tab, input, input_file_name, first_instruction, program_size))
 	{
 		return 1;
-	}
+	}*/
 	
     fclose(input);
     

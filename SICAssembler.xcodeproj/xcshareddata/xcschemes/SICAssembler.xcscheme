@@ -52,7 +52,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "/Users/davidwisnosky/Programs/C/SICAssembler/SICAssembler/tests/copy.sic"
+            argument = "/Users/davidwisnosky/Programs/C/SICAssembler/SICAssembler/tests/test_string.sic"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
