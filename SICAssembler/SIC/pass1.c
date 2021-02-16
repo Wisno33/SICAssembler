@@ -297,9 +297,9 @@ int pass1(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 						return 1;
 					}
 					
-					//If the integer constant is too large for the SIC architecture error.
+					//If the integer constant is too large / small for the SIC architecture error.
 					long int_literal = strtol(token3, NULL, 10);
-					if(int_literal >= 16777216)
+					if(int_literal > 8388607 || int_literal < -8388608)
 					{
 						printf("ERROR! Int literal is too large Line: %d, %lx\n", source_line, int_literal);
 						return 1;
