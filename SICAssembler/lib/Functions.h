@@ -13,6 +13,9 @@ void remove_end_whitespace(char* string);
 //Checks if all characters of a string are digits i.e. the string is a number. Return 0 if false 1 if true.
 int is_integer(char* num_string);
 
+//Checks if all characters of a string are valid hexadecimal. Return 0 if false 1 if true.
+int is_hex(char* hex_string);
+
 //Removes the extension of a file.
 void remove_file_extension(char* file_name);
 

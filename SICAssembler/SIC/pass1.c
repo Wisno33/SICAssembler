@@ -94,11 +94,11 @@ int pass1(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 			token = strtok(NULL, "\n");
 			token3 = token;
 			
-			//If the line is empty move to next line of source.
+			//If the line is empty move error.
 			if(token1 == NULL)
 			{
-				source_line += 1;
-				continue;
+				printf("ERROR! Blank lines not allowed in source Line: %d\n", source_line);
+				return 1;
 			}
 			
 			//Line contains a possible symbol.
@@ -259,6 +259,13 @@ int pass1(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 						token3 += 1;
 						char* hex_constant = strtok(token3, "'");
 						int hex_constant_len  = (int) strlen(hex_constant);
+						
+						//Checks if the operand is valid hex.
+						if(!is_hex(hex_constant))
+						{
+							printf("ERROR! Operand for BYTE is not valid hex Line: %d, %s\n", source_line, hex_constant);
+							return 1;
+						}
 						
 						//If the operand is odd numbered an additional half byte is added.
 						if(hex_constant_len % 2)

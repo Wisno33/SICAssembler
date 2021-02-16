@@ -69,10 +69,37 @@ void remove_end_whitespace(char* string)
 //Checks if all characters of a string are digits i.e. the string is a number. Return 0 if false 1 if true.
 int is_integer(char* num_string)
 {
+	if(num_string == NULL)
+	{
+		return 0;
+	}
+	
 	int i = 0;
 	for(; i<strlen(num_string); i++)
 	{
 		if(!isdigit(num_string[i]))
+		{
+			return 0;
+		}
+	}
+	
+	return 1;
+}
+
+//Checks if all characters of a string are valid hexadecimal. Return 0 if false 1 if true.
+int is_hex(char* hex_string)
+{
+	if(hex_string == NULL)
+	{
+		return 0;
+	}
+	
+	int i = 0;
+	for(; i < strlen(hex_string); i++)
+	{
+		char ch = hex_string[i];
+		
+		if ((ch < '0' || ch > '9') && (ch < 'A' || ch > 'F'))
 		{
 			return 0;
 		}
