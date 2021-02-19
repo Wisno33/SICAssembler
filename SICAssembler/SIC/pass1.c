@@ -298,10 +298,10 @@ int pass1(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 					}
 					
 					//If the integer constant is too large / small for the SIC architecture error.
-					long int_literal = strtol(token3, NULL, 10);
+					int int_literal = (int) strtol(token3, NULL, 10);
 					if(int_literal > 8388607 || int_literal < -8388608)
 					{
-						printf("ERROR! Int literal is outside the bounds of 24bit two's complement (-8388608 <= X <= 8388607) Line: %d, %lx\n", source_line, int_literal);
+						printf("ERROR! Int literal is outside the bounds of 24bit two's complement (-8388608 <= X <= 8388607) Line: %d, %d\n", source_line, int_literal);
 						return 1;
 					}
 					
