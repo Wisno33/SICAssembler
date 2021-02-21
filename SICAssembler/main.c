@@ -30,7 +30,7 @@ int main(int argc, const char * argv[]) {
     //Checks if the correct number of arguments is provided.
     if(argc != 2)
     {
-        printf("ERROR! Invalid argument count! Expected 1. USAGE: %s filename \n", argv[0]);
+        printf("USAGE: %s filename \n", argv[0]);
         return 1;
     }
     
@@ -43,6 +43,11 @@ int main(int argc, const char * argv[]) {
         printf("ERROR! %s cannot be opened\n", argv[1]);
         return 1;
     }
+	
+	//Get file name for object file naming.
+	char* input_file_name = malloc(sizeof(argv[1]));
+	strcpy(input_file_name, argv[1]);
+	remove_file_extension(input_file_name);
     
     //Creates a directive, instruction, and symbol tables.
     hash_table* dir_tab = hash_table_init();
@@ -64,9 +69,6 @@ int main(int argc, const char * argv[]) {
 	}
 	
 	rewind(input);
-	
-	char* input_file_name = argv[1];
-	remove_file_extension(input_file_name);
 	
 	if(pass2(dir_tab, instruct_tab, sym_tab, input, input_file_name, first_instruction, program_size))
 	{

@@ -20,12 +20,31 @@
 
 
 //Creates an object file from a header record, set of text records, and end record.
-void create_object_file(header_record header_r, queue* text_records, end_record end_r)
+void create_object_file(char* input_file_name, header_record header_r, queue* text_rs, end_record end_r)
 {
-	//FILE* output;
+	//Removes the file extension to name the object file.
+	remove_file_extension(input_file_name);
+	
+	FILE* output;
 	
 	//The SIC object file.
-	//output = fopen(strcat(input_file_name, ".o"), "w+");
+	output = fopen(strcat(input_file_name, ".o"), "w+");
+	
+	//Writes the header record to the object file.
+	fprintf(output, "%c%-6s%06X%06X\n", header_r.identifier, header_r.name, header_r.start_address, header_r.program_size);
+	
+	//Writes text records to the object file.
+	while(text_rs->size > 0)
+	{
+		text_record* text_r = queue_dequeue(text_rs);
+		
+		fprintf(output, "%c%06X%02X%s\n", text_r->identifier, text_r->start_address, text_r->record_len, text_r->data);
+	}
+
+	//Writes the end record
+	fprintf(output, "%c%06X", end_r.identifier, end_r.first_instruction);
+	
+	fclose(output);
 }
 
 //Pass 2 of the SIC assembler input is a SIC program output will be a SIC object file.
@@ -33,9 +52,15 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 {
 	//Record data.
 	header_record header_r;
-	queue* text_records = queue_init(128);
 	end_record end_r;
-	queue* mod_records = queue_init(128);
+	
+	//Pointer to current text record and the queue of all text records.
+	text_record* text_r_cur;
+	queue* text_rs = queue_init(128);
+	char* text_object_code_string;
+	
+	//modification_record* mod_r_cur;
+	//queue* mod_rs = queue_init(128);
 	
 	int source_line = 1;
 	int location_counter = 0;
@@ -44,9 +69,10 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 	
 	//Variables specific to creation of text record(s).
 	int text_record_in_prog = 0;
-	int text_record_end = 0;
-	int column_counter = 1;
-	int record_continuity_broken = 0;
+	int column_counter = 0;
+	
+	//Modification Record tracker.
+	//int record_continuity_broken = 0;
 	
 	char* token1;
 	char* token2;
@@ -130,6 +156,10 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 			token1 = NULL;
 		}
 		
+		//Removes extra whitespace on the tokens.
+		token2 = remove_begin_whitespace(token2);
+		token3 = remove_begin_whitespace(token3);
+		
 		//Checks for end directive begins to end pass2 when encontred.
 		if(!strcmp(token2, "END"))
 		{
@@ -141,31 +171,154 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 			break;
 		}
 		
-		//This section will create the text records.
-		
-		//Starts a text record if one is not in progress, pushes it to the text record queue for storage and modification.
+		//Start a new text record if one is not in progress.
 		if(!text_record_in_prog)
 		{
 			text_record_in_prog = 1;
 			
-			text_record* text_r = malloc(sizeof(text_record));
-			
-			text_r->identifier = 'T';
-			text_r->start_address = location_counter;
-			text_r->object_data = queue_init(64);
-			
-			queue_element* el = malloc(sizeof(queue_element));
-			
-			el->item = text_r;
-			
-			queue_enqueue(text_records, el);
-			
-			column_counter = 10;
+			//Creates a new text record and places it in the queue of text records for writing to a file.
+			text_r_cur = new_text_record(text_rs, location_counter, &column_counter);
 		}
 		
 		//Checks if the line contains a directive if so convert the operand (if it exists) to object code.
 		if(is_directive(dir_tab, token2))
 		{
+			//Add the character or hex constant to the text record string.
+			if(!strcmp(token2, "BYTE"))
+			{
+				//If the operand is a character constant location counter is incremented by len(operand) bytes.
+				if(token3[0] == 'C')
+				{
+					//Moves pointer past the C.
+					token3 += 1;
+					char* char_constant = strtok(token3, "'");
+					int char_constant_len  = (int) strlen(char_constant);
+					
+					//If the new object code would overfill the text record a new one is created. (Each char is 2 hex chars)
+					if(!is_room_left_text_record(char_constant_len * 2, &column_counter))
+					{
+						//Finish the completed text record.
+						text_r_cur->record_len = location_counter - text_r_cur->start_address;
+						text_r_cur->data[strlen(text_r_cur->data)] = '\0';
+						
+						text_r_cur = new_text_record(text_rs, location_counter, &column_counter);
+					}
+					
+					//Convert the string of chars to ascii and then hex, and add it to the text record.
+					int i = 0;
+					for(; i < char_constant_len; i++)
+					{
+						sprintf(text_object_code_string, "%X", char_constant[i]);
+						
+						strcat(text_r_cur->data, text_object_code_string);
+					}
+										
+					location_counter += char_constant_len;
+				}
+				
+				//If the operand is a hex constant location counter is incremented by len(operand)/2 bytes.
+				else if(token3[0] == 'X')
+				{
+					//Moves pointer past the X.
+					token3 += 1;
+					char* hex_constant = strtok(token3, "'");
+					int hex_constant_len  = (int) strlen(hex_constant);
+					
+					//If the new object code would overfill the text record a new one is created.
+					if(!is_room_left_text_record(hex_constant_len, &column_counter))
+					{
+						//Finish the completed text record.
+						text_r_cur->record_len = location_counter - text_r_cur->start_address;
+						text_r_cur->data[strlen(text_r_cur->data)] = '\0';
+						
+						text_r_cur = new_text_record(text_rs, location_counter, &column_counter);
+					}
+					
+					//Add hex constant to text record.
+					strcat(text_r_cur->data, hex_constant);
+					
+					location_counter += hex_constant_len/2;
+				}
+			}
+			
+			//Add an integer literal to the text record string.
+			else if(!strcmp(token2, "WORD"))
+			{
+				//Removes extra whitespace.
+				remove_end_whitespace(token3);
+				
+				//If the new object code would overfill the text record a new one is created.
+				if(!is_room_left_text_record(6, &column_counter))
+				{
+					//Finish the completed text record.
+					text_r_cur->record_len = location_counter - text_r_cur->start_address;
+					text_r_cur->data[strlen(text_r_cur->data)] = '\0';
+					
+					text_r_cur = new_text_record(text_rs, location_counter, &column_counter);
+				}
+				
+				//Converts string to an integer.
+				int integer_constant = atoi(token3);
+				
+				sprintf(text_object_code_string, "%06X", integer_constant);
+				strcat(text_r_cur->data, text_object_code_string);
+				
+				location_counter += 3;
+			}
+			
+			//RESB directive generates no object code, but must be scanned for proper location counter tracking.
+			else if(!strcmp(token2, "RESB"))
+			{
+				//Removes extra whitespace.
+				remove_end_whitespace(token3);
+				
+				//End the text record, reserving memory is not documented in object code.
+				text_r_cur->record_len = location_counter - text_r_cur->start_address;
+				text_r_cur->data[strlen(text_r_cur->data)] = '\0';
+			
+				text_record_in_prog = 0;
+				
+				int bytes_reserved = (int) strtol(token3, NULL, 10);
+				
+				location_counter += bytes_reserved;
+			}
+			
+			//RESW directive generates no object code, but must be scanned for proper location counter tracking.
+			else if(!strcmp(token2, "RESW"))
+			{
+				//Removes extra whitespace.
+				remove_end_whitespace(token3);
+				
+				//End the text record, reserving memory is not documented in object code.
+				text_r_cur->record_len = location_counter - text_r_cur->start_address;
+				text_r_cur->data[strlen(text_r_cur->data)] = '\0';
+			
+				text_record_in_prog = 0;
+				
+				int words_reserved = (int) strtol(token3, NULL, 10);
+				
+				location_counter += words_reserved * 3;
+			}
+			
+			//RESR directive generates no object code, but must be scanned for proper location counter tracking.
+			else if(!strcmp(token2, "RESR"))
+			{
+				//Removes extra whitespace.
+				remove_end_whitespace(token3);
+				
+				//End the text record, reserving memory is not documented in object code.
+				text_r_cur->record_len = location_counter - text_r_cur->start_address;
+				text_r_cur->data[strlen(text_r_cur->data)] = '\0';
+			
+				text_record_in_prog = 0;
+				
+				location_counter += 3;
+			}
+			
+			//EXPORTS
+			else if(!strcmp(token2, "EXPORTS"))
+			{
+			}
 			
 		}
 		
@@ -176,6 +329,9 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 			//Checks if an argument was supplied to the instruction is not NULL, also not RSUB(Special case no operand), if so generate object code.
 			if(token3 != NULL)
 			{
+				//Removes extra whitespace.
+				remove_end_whitespace(token3);
+				
 				//Checks for RSUB case.
 				if(!strcmp(token2, "RSUB"))
 				{
@@ -191,17 +347,14 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 				//The index mode character.
 				token = strtok(NULL, "\n");
 				
+				//If an X char is found then set indexing mode, value of indexing mode is the value of the 16th bit = 1.
 				if(token != NULL && *token == 'X')
 				{
-					indexing_mode = 1;
+					indexing_mode = 32768;
 				}
 				
 				//Retrieve instruction data, and add it to the record.
 				instruction* cur_instruct = hash_table_get(instruct_tab, token2);
-			   
-				queue_element* object_code_mnemonic = malloc(sizeof(queue_element));
-			   
-				object_code_mnemonic->item = &cur_instruct->opcode;
 			   
 				//Get symbol data.
 				symbol* cur_operand = hash_table_get(sym_tab, token3);
@@ -211,27 +364,24 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 				{
 					printf("ERORR! Symbol %s not defined Line: %d\n", token3, source_line);
 				}
-			   	
-				queue_element* object_code_address = malloc(sizeof(queue_element));
-			   
-				object_code_address->item = &cur_operand->address;
 				
-				//Sets the 16th bit to 1.
-				if(indexing_mode)
+				//If the new object code would overfill the text record a new one is created. (Size of instruction is in bytes * 2 = hex chars)
+				if(!is_room_left_text_record(cur_instruct->size * 2, &column_counter))
 				{
-					object_code_address->item += 32768;
+					//Finish the completed text record.
+					text_r_cur->record_len = location_counter - text_r_cur->start_address;
+					text_r_cur->data[strlen(text_r_cur->data)] = '\0';
+					
+					text_r_cur = new_text_record(text_rs, location_counter, &column_counter);
 				}
 				
-				//Gets current record data to be appended too.
-				text_record* cur_t_record = queue_peek(text_records);
+				sprintf(text_object_code_string, "%02X%04X", cur_instruct->opcode, cur_operand->address + indexing_mode);
 				
-				//Adds data to current text records object code queue.
-				queue_enqueue(cur_t_record->object_data, object_code_mnemonic);
-				queue_enqueue(cur_t_record->object_data, object_code_address);
+				//Add hex constant to text record.
+				strcat(text_r_cur->data, text_object_code_string);
 				
 				location_counter += cur_instruct->size;
 				
-				column_counter += 6;
 			}
 			
 			//Creates object code for RSUB (special case instruction no operand)
@@ -240,13 +390,22 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 				
 				instruction* cur_instruct = hash_table_get(instruct_tab, token2);
 				
-				queue_element* object_code_mnemonic = malloc(sizeof(queue_element));
+				//If the new object code would overfill the text record a new one is created. (Size of instruction is in bytes * 2 = hex chars)
+				if(!is_room_left_text_record(cur_instruct->size * 2, &column_counter))
+				{
+					//Finish the completed text record.
+					text_r_cur->record_len = location_counter - text_r_cur->start_address;
+					text_r_cur->data[strlen(text_r_cur->data)] = '\0';
+					
+					text_r_cur = new_text_record(text_rs, location_counter, &column_counter);
+				}
 				
-				object_code_mnemonic->item = &cur_instruct->opcode;
+				sprintf(text_object_code_string, "%c000000", cur_instruct->opcode);
 				
-				text_record* cur_t_r = queue_peek(text_records);
+				//Add hex constant to text record.
+				strcat(text_r_cur->data, text_object_code_string);
 				
-				queue_enqueue(cur_t_r->object_data, object_code_mnemonic);
+				location_counter += cur_instruct->size;
 			}
 			
 			//If the instruction has no operand and is not RSUB requires operand error.
@@ -255,35 +414,16 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 				printf("ERROR! No operand provided for %s requires 1 Line: %d\n", token2, source_line);
 				return 1;
 			}
-			
-			
-			
 		}
 		
 		source_line += 1;
-		
 	}
 	
+	//Finish the completed final text record.
+	text_r_cur->record_len = location_counter - text_r_cur->start_address;
+	text_r_cur->data[strlen(text_r_cur->data)] = '\0';
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	queue_print(text_records);
-	
-	
-	create_object_file(header_r, text_records, end_r);
+	create_object_file(input_file_name, header_r, text_rs, end_r);
 	
 	return 0;
 }

@@ -261,16 +261,10 @@ int pass1(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 						int hex_constant_len  = (int) strlen(hex_constant);
 						
 						//Checks if the operand is valid hex.
-						if(!is_hex(hex_constant))
+						if(!is_hex(hex_constant) || hex_constant_len % 2 != 0)
 						{
 							printf("ERROR! Operand for BYTE is not valid hex Line: %d, %s\n", source_line, hex_constant);
 							return 1;
-						}
-						
-						//If the operand is odd numbered an additional half byte is added.
-						if(hex_constant_len % 2)
-						{
-							hex_constant_len += 1;
 						}
 						
 						location_counter += hex_constant_len/2;

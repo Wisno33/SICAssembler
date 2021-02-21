@@ -48,6 +48,7 @@ typedef struct symbol
     int source_line;
     int address;
     char name[7];
+	
 } symbol;
 
 //Structure to contain a header record to be written to a file.
@@ -57,6 +58,7 @@ typedef struct header_record
 	int start_address;
 	int program_size;
 	char name[7];
+	
 } header_record;
 
 //Structure to contain a text record to be written to a file.
@@ -65,7 +67,8 @@ typedef struct text_record
 	char identifier;
 	int start_address;
 	int record_len;
-	queue* object_data;
+	char data[60];
+	
 } text_record;
 
 //Structure to contain an end record to be written to a file.
@@ -73,6 +76,7 @@ typedef struct end_record
 {
 	char identifier;
 	int first_instruction;
+	
 } end_record;
 
 
@@ -80,6 +84,11 @@ typedef struct end_record
 typedef struct modification_record
 {
 	char identifier;
+	int start_address;
+	int mod_len;
+	char flag;
+	char relative_sym[7];
+	
 } modification_record;
 
 //Public functions.
@@ -109,5 +118,11 @@ int is_valid_symbol(hash_table* sym_tab, char* test, hash_table* directives, has
 
 //Tests if content in the operand column is possibly valid.
 int test_operand_column(char* partial_line);
+
+//Creates a new text record, adds it to a queue of text records, and sets tracking values / conditions.
+text_record* new_text_record(queue* text_records, int location_counter, int* column_counter);
+
+//Checks if object code will fit in a given text record. Return 1 if it will fit 0 otherwise.
+int is_room_left_text_record(int object_code_len, int* cur_column);
 
 #endif /* assembler_components_h */

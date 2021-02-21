@@ -1,5 +1,8 @@
 //  assembler_components.c
 
+//STD C libraries.
+#include <stdlib.h>
+
 //Header for function prototypes.
 #include "assembler_components.h"
 
@@ -185,6 +188,43 @@ int test_operand_column(char* operand)
 		printf("ERROR: Invalid string operand ");
 		return 0;
 	}
+	
+	return 1;
+}
+
+//Creates a new text record, adds it to a queue of text records, and sets tracking values / conditions.
+text_record* new_text_record(queue* text_records, int location_counter, int* column_counter)
+{
+	//Creates a new text record and places it in the queue of text records for writing to a file.
+	text_record* text_r = malloc(sizeof(text_record));
+	
+	text_r->identifier = 'T';
+	text_r->start_address = location_counter;
+	
+	//Set the column counter to track the size of the text record. (T + start address = 7 columns)
+	*column_counter = 8;
+	
+	//Adds the text record to the queue of text records.
+	queue_element* el = malloc(sizeof(queue_element));
+	
+	el->item = text_r;
+	
+	queue_enqueue(text_records, el);
+	
+	//Return the new text record to be filled.
+	return text_r;
+}
+
+//Checks if object code will fit in a given text record. Increments the column counter and Return 1 if it will fit return 0 otherwise.
+int is_room_left_text_record(int object_code_len, int* cur_column)
+{	
+	//Text records can only contain 69 columns.
+	if(*cur_column + object_code_len > 69)
+	{
+		return 0;
+	}
+	
+	*cur_column += object_code_len;
 	
 	return 1;
 }
