@@ -38,6 +38,12 @@ void create_object_file(char* input_file_name, header_record header_r, queue* te
 	{
 		text_record* text_r = queue_dequeue(text_rs);
 		
+		//Skip over empty text records.
+		if(text_r->record_len == 0)
+		{
+			continue;
+		}
+		
 		fprintf(output, "%c%06X%02X%s\n", text_r->identifier, text_r->start_address, text_r->record_len, text_r->data);
 	}
 
@@ -400,7 +406,7 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 					text_r_cur = new_text_record(text_rs, location_counter, &column_counter);
 				}
 				
-				sprintf(text_object_code_string, "%c000000", cur_instruct->opcode);
+				sprintf(text_object_code_string, "%02X0000", cur_instruct->opcode);
 				
 				//Add hex constant to text record.
 				strcat(text_r_cur->data, text_object_code_string);
