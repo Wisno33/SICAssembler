@@ -45,7 +45,7 @@ int main(int argc, const char * argv[]) {
     }
 	
 	//Get file name for object file naming.
-	char* input_file_name = malloc(sizeof(argv[1]));
+	char* input_file_name = malloc(sizeof(char) * strlen(argv[1]));
 	strcpy(input_file_name, argv[1]);
 	remove_file_extension(input_file_name);
     

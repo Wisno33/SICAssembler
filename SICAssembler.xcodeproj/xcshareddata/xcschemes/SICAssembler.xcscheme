@@ -60,7 +60,7 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "/Users/davidwisnosky/Programs/C/SICAssembler/SICAssembler/tests/test21.sic"
+            argument = "/Users/davidwisnosky/Programs/C/SICAssembler/SICAssembler/tests/test30.sic"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

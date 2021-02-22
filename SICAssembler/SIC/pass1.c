@@ -165,6 +165,13 @@ int pass1(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 				//End directive.
 				if(!strcmp(token2, "END"))
 				{
+					//Check if an END directive was already encontred only one is allowed.
+					if(end_dir_encountered)
+					{
+						printf("ERROR! Multiple END directives 2nd END Line: %d, %s\n", source_line, token3);
+						return 1;
+					}
+					
 					if(token3 != NULL)
 					{
 					
@@ -417,7 +424,7 @@ int pass1(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 	}
 	
 	//Prints the symbol table.
-	//print_sym_tab(sym_tab, symbol_order);
+	print_sym_tab(sym_tab, symbol_order);
 	
 	return 0;
 }

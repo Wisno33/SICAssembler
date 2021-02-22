@@ -200,9 +200,10 @@ text_record* new_text_record(queue* text_records, int location_counter, int* col
 	
 	text_r->identifier = 'T';
 	text_r->start_address = location_counter;
+	memset(text_r->data, '\0', 60);
 	
 	//Set the column counter to track the size of the text record. (T + start address = 7 columns)
-	*column_counter = 8;
+	*column_counter = 10;
 	
 	//Adds the text record to the queue of text records.
 	queue_element* el = malloc(sizeof(queue_element));
