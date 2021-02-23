@@ -68,8 +68,10 @@ int main(int argc, const char * argv[]) {
         return 1;
 	}
 	
+	//Move pointer to start of file for second pass.
 	rewind(input);
 	
+	//Runs pass 2 of the assembler if no errors are present the relocatable object file is generated. If pass 2 returns 1 the assembler exits.
 	if(pass2(dir_tab, instruct_tab, sym_tab, input, input_file_name, first_instruction, program_size))
 	{
 		return 1;
