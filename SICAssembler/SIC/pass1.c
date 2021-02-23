@@ -424,7 +424,7 @@ int pass1(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 	}
 	
 	//Prints the symbol table.
-	print_sym_tab(sym_tab, symbol_order);
+	//print_sym_tab(sym_tab, symbol_order);
 	
 	return 0;
 }

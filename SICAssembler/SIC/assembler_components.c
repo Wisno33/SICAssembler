@@ -220,7 +220,7 @@ text_record* new_text_record(queue* text_records, int location_counter, int* col
 int is_room_left_text_record(int object_code_len, int* cur_column)
 {	
 	//Text records can only contain 69 columns.
-	if(*cur_column + object_code_len > 69)
+	if(*cur_column + object_code_len > 70)
 	{
 		return 0;
 	}

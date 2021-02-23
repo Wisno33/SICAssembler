@@ -286,21 +286,82 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 					char* hex_constant = strtok(token3, "'");
 					int hex_constant_len  = (int) strlen(hex_constant);
 					
-					//If the new object code would overfill the text record a new one is created.
-					if(!is_room_left_text_record(hex_constant_len, &column_counter))
+					//If the new object code would overfill the text record a new one is created. (Each char is 2 hex chars)
+					if(!is_room_left_text_record(hex_constant_len * 2, &column_counter))
 					{
-						//Finish the completed text record.
-						text_r_cur->record_len = location_counter - text_r_cur->start_address;
-						//text_r_cur->data[strlen(text_r_cur->data)] = '\0';
+						//Place as much as possible into current record.
+						int columns_left = 70 - column_counter;
+						int hex_constant_len_remaining = hex_constant_len;
 						
-						//Create new text record.
-						text_r_cur = new_text_record(text_rs, location_counter, &column_counter);
+						int index = 0;
+						for(; index < columns_left; index++)
+						{
+							//Convert the string of chars to ascii and then hex, and add it to the text record.
+							sprintf(text_object_code_string, "%c", hex_constant[index]);
+							strcat(text_r_cur->data, text_object_code_string);
+							
+							--hex_constant_len_remaining;
+							
+							column_counter += 1;
+							
+							//Only increment location counter every other hex char. (Each hex char is a half byte)
+							if((index + 1) % 2 == 0)
+							{
+								location_counter += 1;
+							}
+						}
+						
+						
+						//BYTE constants can exceed multiple records so multiple may have to be created.
+						//Get the number of records required for the constant.
+						int text_records_needed = (int) ceil(hex_constant_len_remaining / 60.0);
+						
+						int i = 0;
+						
+						for(; i < text_records_needed; i++)
+						{
+							//Finish the completed text record.
+							text_r_cur->record_len = location_counter - text_r_cur->start_address;
+							//text_r_cur->data[strlen(text_r_cur->data)] = '\0';
+							
+							//Create new text record.
+							text_r_cur = new_text_record(text_rs, location_counter, &column_counter);
+							
+							int j = 0;
+							for(; j < 60; j++)
+							{
+								//End if the constant is done before the record is full.
+								if(index == hex_constant_len)
+								{
+									break;
+								}
+								
+								sprintf(text_object_code_string, "%c", hex_constant[index++]);
+								strcat(text_r_cur->data, text_object_code_string);
+								
+								column_counter += 1;
+								
+								//Only increment location counter every other hex char. (Each hex char is a half byte)
+								if((index + 1) % 2 == 0)
+								{
+									location_counter += 1;
+								}
+							}
+						}
 					}
 					
-					//Add hex constant to text record.
-					strcat(text_r_cur->data, hex_constant);
-					
-					location_counter += hex_constant_len/2;
+					else
+					{
+						//Convert the string of chars to ascii and then hex, and add it to the text record.
+						int i = 0;
+						for(; i < hex_constant_len; i++)
+						{
+							sprintf(text_object_code_string, "%c", hex_constant[i]);
+							strcat(text_r_cur->data, text_object_code_string);
+						}
+										
+						location_counter += hex_constant_len / 2;
+					}
 				}
 			}
 			
@@ -319,6 +380,8 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 					
 					//Create new text record.
 					text_r_cur = new_text_record(text_rs, location_counter, &column_counter);
+					
+					column_counter += 6;
 				}
 				
 				//Converts string to an integer.
@@ -440,6 +503,8 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 					
 					//Create new text record.
 					text_r_cur = new_text_record(text_rs, location_counter, &column_counter);
+					
+					column_counter += cur_instruct->size * 2;
 				}
 				
 				//Convert to hex and add constant to text record.
@@ -465,6 +530,8 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 					
 					//Create new text record.
 					text_r_cur = new_text_record(text_rs, location_counter, &column_counter);
+					
+					column_counter += cur_instruct->size * 2;
 				}
 				
 				//Convert to hex and add constant to text record.
