@@ -10,7 +10,6 @@
 		DD0068BB25D85793003F0FE2 /* pass2.c in Sources */ = {isa = PBXBuildFile; fileRef = DD0068BA25D85793003F0FE2 /* pass2.c */; };
 		DD7193D125D1F67D0035398C /* Hash_Table.c in Sources */ = {isa = PBXBuildFile; fileRef = DD7193D025D1F67D0035398C /* Hash_Table.c */; };
 		DD7193D525D1F6850035398C /* Queue.c in Sources */ = {isa = PBXBuildFile; fileRef = DD7193D425D1F6850035398C /* Queue.c */; };
-		DD7193D925D1F68E0035398C /* Stack.c in Sources */ = {isa = PBXBuildFile; fileRef = DD7193D825D1F68E0035398C /* Stack.c */; };
 		DD7193DD25D1FAAD0035398C /* assembler_components.c in Sources */ = {isa = PBXBuildFile; fileRef = DD7193DC25D1FAAD0035398C /* assembler_components.c */; };
 		DDAA92A325D5EBB9008E1147 /* Functions.c in Sources */ = {isa = PBXBuildFile; fileRef = DDAA92A225D5EBB9008E1147 /* Functions.c */; };
 		DDAE6A5125D1A49200B0BAA2 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = DDAE6A5025D1A49200B0BAA2 /* main.c */; };
@@ -39,8 +38,6 @@
 		DD7193D025D1F67D0035398C /* Hash_Table.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Hash_Table.c; sourceTree = "<group>"; };
 		DD7193D325D1F6850035398C /* Queue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Queue.h; sourceTree = "<group>"; };
 		DD7193D425D1F6850035398C /* Queue.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Queue.c; sourceTree = "<group>"; };
-		DD7193D725D1F68E0035398C /* Stack.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Stack.h; sourceTree = "<group>"; };
-		DD7193D825D1F68E0035398C /* Stack.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Stack.c; sourceTree = "<group>"; };
 		DD7193DB25D1FAAD0035398C /* assembler_components.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = assembler_components.h; sourceTree = "<group>"; };
 		DD7193DC25D1FAAD0035398C /* assembler_components.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = assembler_components.c; sourceTree = "<group>"; };
 		DDAA92A125D5EBB9008E1147 /* Functions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Functions.h; sourceTree = "<group>"; };
@@ -109,8 +106,6 @@
 				DD7193D025D1F67D0035398C /* Hash_Table.c */,
 				DD7193D325D1F6850035398C /* Queue.h */,
 				DD7193D425D1F6850035398C /* Queue.c */,
-				DD7193D725D1F68E0035398C /* Stack.h */,
-				DD7193D825D1F68E0035398C /* Stack.c */,
 				DDAA92A125D5EBB9008E1147 /* Functions.h */,
 				DDAA92A225D5EBB9008E1147 /* Functions.c */,
 			);
@@ -199,7 +194,6 @@
 				DDAE6A5125D1A49200B0BAA2 /* main.c in Sources */,
 				DDAA92A325D5EBB9008E1147 /* Functions.c in Sources */,
 				DDAE6A5C25D1A59900B0BAA2 /* initialize.c in Sources */,
-				DD7193D925D1F68E0035398C /* Stack.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
