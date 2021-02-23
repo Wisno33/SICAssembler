@@ -287,7 +287,7 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 					int hex_constant_len  = (int) strlen(hex_constant);
 					
 					//If the new object code would overfill the text record a new one is created. (Each char is 2 hex chars)
-					if(!is_room_left_text_record(hex_constant_len * 2, &column_counter))
+					if(!is_room_left_text_record(hex_constant_len, &column_counter))
 					{
 						//Place as much as possible into current record.
 						int columns_left = 70 - column_counter;
