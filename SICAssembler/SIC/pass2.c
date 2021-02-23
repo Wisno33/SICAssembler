@@ -240,7 +240,6 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 						{
 							//Finish the completed text record.
 							text_r_cur->record_len = location_counter - text_r_cur->start_address;
-							//text_r_cur->data[strlen(text_r_cur->data)] = '\0';
 							
 							//Create new text record.
 							text_r_cur = new_text_record(text_rs, location_counter, &column_counter);
@@ -322,7 +321,6 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 						{
 							//Finish the completed text record.
 							text_r_cur->record_len = location_counter - text_r_cur->start_address;
-							//text_r_cur->data[strlen(text_r_cur->data)] = '\0';
 							
 							//Create new text record.
 							text_r_cur = new_text_record(text_rs, location_counter, &column_counter);
@@ -376,7 +374,6 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 				{
 					//Finish the completed text record.
 					text_r_cur->record_len = location_counter - text_r_cur->start_address;
-					//text_r_cur->data[strlen(text_r_cur->data)] = '\0';
 					
 					//Create new text record.
 					text_r_cur = new_text_record(text_rs, location_counter, &column_counter);
@@ -402,7 +399,6 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 				
 				//End the text record, reserving memory is not documented in object code.
 				text_r_cur->record_len = location_counter - text_r_cur->start_address;
-				//text_r_cur->data[strlen(text_r_cur->data)] = '\0';
 			
 				text_record_in_prog = 0;
 				
@@ -419,7 +415,6 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 				
 				//End the text record, reserving memory is not documented in object code.
 				text_r_cur->record_len = location_counter - text_r_cur->start_address;
-				//text_r_cur->data[strlen(text_r_cur->data)] = '\0';
 			
 				text_record_in_prog = 0;
 				
@@ -436,7 +431,6 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 				
 				//End the text record, reserving memory is not documented in object code.
 				text_r_cur->record_len = location_counter - text_r_cur->start_address;
-				//text_r_cur->data[strlen(text_r_cur->data)] = '\0';
 			
 				text_record_in_prog = 0;
 				
@@ -499,7 +493,6 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 				{
 					//Finish the completed text record.
 					text_r_cur->record_len = location_counter - text_r_cur->start_address;
-					//text_r_cur->data[strlen(text_r_cur->data)] = '\0';
 					
 					//Create new text record.
 					text_r_cur = new_text_record(text_rs, location_counter, &column_counter);
@@ -526,7 +519,6 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 				{
 					//Finish the completed text record.
 					text_r_cur->record_len = location_counter - text_r_cur->start_address;
-					//text_r_cur->data[strlen(text_r_cur->data)] = '\0';
 					
 					//Create new text record.
 					text_r_cur = new_text_record(text_rs, location_counter, &column_counter);
@@ -554,7 +546,6 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 	
 	//Finish the completed final text record.
 	text_r_cur->record_len = location_counter - text_r_cur->start_address;
-	//text_r_cur->data[strlen(text_r_cur->data)] = '\0';
 	
 	create_object_file(input_file_name, header_r, text_rs, end_r);
 	
