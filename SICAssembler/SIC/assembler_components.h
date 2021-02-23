@@ -125,4 +125,8 @@ text_record* new_text_record(queue* text_records, int location_counter, int* col
 //Checks if object code will fit in a given text record. Return 1 if it will fit 0 otherwise.
 int is_room_left_text_record(int object_code_len, int* cur_column);
 
+//Creates a new modification record, and queues it for writing to a file.
+void create_modification_record(queue* modification_records, int modification_start_address, int modification_len,
+								char flag, char* modification_displacement_symbol);
+
 #endif /* assembler_components_h */

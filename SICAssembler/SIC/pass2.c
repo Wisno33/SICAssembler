@@ -21,7 +21,7 @@
 
 
 //Creates an object file from a header record, set of text records, and end record.
-void create_object_file(char* input_file_name, header_record* header_r, queue* text_rs, end_record* end_r)
+void create_object_file(char* input_file_name, header_record* header_r, queue* text_rs, queue* mod_rs, end_record* end_r)
 {
 	//Removes the file extension to name the object file.
 	remove_file_extension(input_file_name);
@@ -29,7 +29,7 @@ void create_object_file(char* input_file_name, header_record* header_r, queue* t
 	FILE* output;
 	
 	//The SIC object file.
-	output = fopen(strcat(input_file_name, ".o"), "w+");
+	output = fopen(strcat(input_file_name, ".obj"), "w+");
 	
 	//Writes the header record to the object file.
 	fprintf(output, "%c%-6s%06X%06X\n", header_r->identifier, header_r->name, header_r->start_address, header_r->program_size);
@@ -46,6 +46,14 @@ void create_object_file(char* input_file_name, header_record* header_r, queue* t
 		}
 		
 		fprintf(output, "%c%06X%02X%s\n", text_r->identifier, text_r->start_address, text_r->record_len, text_r->data);
+	}
+	
+	//Writes modification records to the object file.
+	while(mod_rs-> size > 0)
+	{
+		modification_record* mod_r = queue_dequeue(mod_rs);
+		
+		fprintf(output, "%c%06X%02X%c%-6s\n", mod_r->identifier, mod_r->start_address, mod_r->mod_len, mod_r->flag, mod_r->relative_sym);
 	}
 
 	//Writes the end record
@@ -65,6 +73,11 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 	text_record* text_r_cur = NULL;
 	queue* text_rs = queue_init(128);
 	
+	//Start symbol for offset, and queue of modification records.
+	char start_sym_name[7];
+	memset(start_sym_name, '\0', 7);
+	queue* mod_rs = queue_init(512);
+	
 	//Individual object code to be written to the text record, never can exceed 60 hex chars.
 	char* text_object_code_string = malloc(sizeof(char) * 60);
 	memset(text_object_code_string, '\0', 60);
@@ -79,9 +92,6 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 	//Variables specific to creation of text record(s).
 	int text_record_in_prog = 0;
 	int column_counter = 0;
-	
-	//Modification Record tracker.
-	//int record_continuity_broken = 0;
 	
 	char* token1 = NULL;
 	char* token2 = NULL;
@@ -141,9 +151,12 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 			symbol* start_sym = hash_table_get(sym_tab, token1);
 			
 			header_r = malloc(sizeof(header_record));
+			
+			//Get start_sym name for header and modification records.
+			strcpy(start_sym_name,start_sym->name);
 		
 			header_r->identifier = 'H';
-			strcpy(header_r->name,start_sym->name);
+			strcpy(header_r->name,start_sym_name);
 			header_r->start_address = start_sym->address;
 			header_r->program_size = program_size;
 			
@@ -504,6 +517,9 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 				sprintf(text_object_code_string, "%02X%04X", cur_instruct->opcode, cur_operand->address + indexing_mode);
 				strcat(text_r_cur->data, text_object_code_string);
 				
+				//Create the associated modification record.
+				create_modification_record(mod_rs, location_counter + 1, (cur_instruct->size * 2) - 2, '+', start_sym_name);
+				
 				location_counter += cur_instruct->size;
 				
 			}
@@ -547,7 +563,7 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 	//Finish the completed final text record.
 	text_r_cur->record_len = location_counter - text_r_cur->start_address;
 	
-	create_object_file(input_file_name, header_r, text_rs, end_r);
+	create_object_file(input_file_name, header_r, text_rs, mod_rs, end_r);
 	
 	return 0;
 }
