@@ -53,11 +53,11 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "/Users/davidwisnosky/Programs/C/SICAssembler/SICAssembler/tests/copy.sic"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/davidwisnosky/Programs/C/SICAssembler/SICAssembler/tests/test_string.sic"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/davidwisnosky/Programs/C/SICAssembler/SICAssembler/tests/test30.sic"
