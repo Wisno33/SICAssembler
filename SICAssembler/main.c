@@ -6,7 +6,7 @@
  * Two pass SIC Assembler, three phases, input is a .sic SIC assembly program and output is a .obj SIC object file.
  * 1. Initialize: required data is loaded from files, the directives and instruction set data.
  * 2. Pass 1: generates a symbol table and checks for syntax and declaration errors.
- * 3. Pass 2: generates a object file from the symbol table and source code, checks for reference and instruction format errors.
+ * 3. Pass 2: generates a relocatable object file from the symbol table and source code, checks for reference and instruction format errors.
  */
 
 //STD C libraries.
