@@ -565,5 +565,12 @@ int pass2(hash_table* dir_tab, hash_table* instruct_tab, hash_table* sym_tab, FI
 	
 	create_object_file(input_file_name, header_r, text_rs, mod_rs, end_r);
 	
+	//Free all structs object file has been generated.
+	free(text_object_code_string);
+	free(header_r);
+	free(end_r);
+	queue_destroy(text_rs);
+	queue_destroy(mod_rs);
+	
 	return 0;
 }

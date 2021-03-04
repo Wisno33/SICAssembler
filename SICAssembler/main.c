@@ -77,7 +77,12 @@ int main(int argc, const char * argv[]) {
 		return 1;
 	}
 	
+	//Free all used memory process has complete correctly.
     fclose(input);
+	free(input_file_name);
+	hash_table_destroy(dir_tab);
+	hash_table_destroy(instruct_tab);
+	hash_table_destroy(sym_tab);
     
     return 0;
 }

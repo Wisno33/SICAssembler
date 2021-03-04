@@ -81,7 +81,6 @@ void queue_destroy(queue* q)
     int i = 0;
     for(; i<q->capacity; i++)
     {
-        free(q->queue[i]->item);
         free(q->queue[i]);
     }
     
