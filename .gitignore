@@ -55,7 +55,7 @@ dkms.conf
 .DS_Store
 
 # Xcode Project file.
-.xcodeproj
+*.xcodeproj
 
 # The output executable
 sicasm
