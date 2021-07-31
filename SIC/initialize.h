@@ -4,8 +4,8 @@
 #define initialize_h
 
 //Constants
-#define SIC_DIRECTIVES "/Users/davidwisnosky/Programs/C/SICAssembler/SICAssembler/SIC/directives.txt"
-#define SIC_INSTRUCTIONS "/Users/davidwisnosky/Programs/C/SICAssembler/SICAssembler/SIC/instructions.txt"
+#define SIC_DIRECTIVES "SIC/directives.txt"
+#define SIC_INSTRUCTIONS "SIC/instructions.txt"
 
 //Public Functions.
 

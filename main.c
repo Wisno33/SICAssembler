@@ -77,7 +77,7 @@ int main(int argc, const char * argv[]) {
 		return 1;
 	}
 	
-	//Free all used memory process has complete correctly.
+	//Free all used memory process has completed correctly.
     fclose(input);
 	free(input_file_name);
 	hash_table_destroy(dir_tab);
