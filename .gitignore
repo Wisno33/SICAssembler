@@ -63,3 +63,6 @@ sicasm
 # Xcode output directories.
 Products/
 Debug/
+
+# SICDocs
+SICDocs/
